@@ -1,0 +1,1209 @@
+Import "ShanHai.lua"
+
+Dim mode = 0  // 0 server, 1 client
+Dim switch = 0
+Dim i
+
+Function server()
+	mode = 0
+	start_app() 
+	start_menu ()
+	Do
+		Delay 1000
+		adventure() 
+		select_game()
+		room_password() 
+		wait_client()
+		battle() 
+	Loop
+End Function
+
+Function client()
+	mode = 1
+	
+	UI.NewLayout("frame")
+	UI.AddEditText ("frame", "account", "1")
+	UI.SetOnClose("frame", ui_close)
+	UI.Show ("frame")
+
+
+	
+	Dir.Copy "/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(i) & "/data10.bin", "/data/data/jp.co.mixi.monsterstrikeTW/data10.bin"
+	
+	start_app ()
+	start_menu ()
+		
+	Do
+		Delay 1000
+		join_room() 
+		battle() 
+		If switch = 1 Then 
+		 	i = i+ 1
+			i = change_user(i, i - 1)
+			switch = 0
+			start_app ()
+			start_menu ()
+		End If
+	Loop
+End Function
+
+Function creator()
+
+	ShanHai.Mount ("/data")
+	
+	If Dir.Exist("/storage/emulated/legacy/MobileAnJian/dataBase") = 0 Then 
+		Dir.Create("/storage/emulated/legacy/MobileAnJian/dataBase")
+	End If
+	
+	For 20
+		Dim index = 1
+		Do
+			ShowMessage "/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(index)
+			If Dir.Exist("/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(index)) = 2 Then 
+				index = index + 1
+			Else 
+				reset_app ()
+				start_app()
+				create_account(index)
+				Dir.Create ("/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(index) & "/")
+				Dir.Copy "/data/data/jp.co.mixi.monsterstrikeTW/data10.bin", "/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(index) & "/data10.bin"
+				
+				If index = 20 Then 
+					Exit Function
+				End If
+			End If
+			
+		Loop
+	Next
+End Function
+
+Function create_account(index)
+	Do
+		If CmpColorEx("623|940|0048ED,490|931|00E0FF,437|940|0048ED,396|932|00DAFF,248|940|006DF2,217|930|00E4FF",0.9) = 1 Then
+			Touch 362, 969, 500
+			ShowMessage "Click Accept Button"
+			Delay 1000
+			//Start Menu
+			Do
+				If CmpColorEx("40|1206|39CBB2,573|1198|0043EA,671|1200|0081F4", 0.9) = 1 Then 
+					Touch 274, 365, 500
+					ShowMessage "Touch Start Menu"
+					Delay 1000
+				Else
+					TracePrint 0
+				End If
+					
+					
+				If CmpColorEx("463|243|5A5A5A,13|306|6B6B6C,19|312|414141,24|249|313030,416|746|00E1FF,282|754|0048EB,424|667|EDEDED",0.9) = 1 Then
+					Delay 500
+					Touch 356, 672, 500
+					ShowMessage "Blank Area"
+					Delay 1000
+					InputText CStr(index)
+					Delay 1000
+					Touch 359, 774, 500
+					Delay 1000
+					Touch 359, 774, 500
+					Do
+						// click datechange
+						Touch 359, 715, 500
+						Delay 500
+						
+						If CmpColorEx("605|495|694F42,436|715|004AEE,437|710|00DAFD,366|709|00E3FE,283|709|00F6FF,114|791|694D44",0.9) = 1 Then
+							Touch 356, 741, 500
+							ShowMessage "Click OK Button"
+							Delay 750
+						Else
+							TracePrint 0
+						End If
+						
+						// make sure startgame
+						If CmpColorEx("322|1262|00435E,206|1250|005C80,104|1248|004865,43|1213|0083B7,7|1230|00ACF1,699|1204|00ADF2,565|1222|0081B5",0.9) = 1 Then
+							Exit Do
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else
+					TracePrint 0
+				End If
+						
+				Delay 1000
+			Loop
+			
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+	
+	Do
+		If CmpColorEx("322|1262|00435E,206|1250|005C80,104|1248|004865,43|1213|0083B7,7|1230|00ACF1,699|1204|00ADF2,565|1222|0081B5",0.9) = 1 Then
+			Touch 358, 985, 500
+			Delay 500
+			Touch 352, 1055, 500
+			Delay 500
+			Swipe 521, 829, 204, 857, 200
+			Delay 750
+		Else
+			TracePrint 0
+		End If
+		
+		If CmpColorEx("602|428|6A5044,119|423|6B5244,110|868|9B716B,607|865|694E46,437|754|00E7FE,340|775|FFFFFF,441|1245|005E83,326|1241|006790",0.9) = 1 Then
+			Touch 362, 785, 500
+			ShowMessage "Click OK Button"
+			Delay 750
+			// battleend
+			Do
+				Touch 327, 1148, 500
+				If CmpColorEx("626|718|FFFFFF,126|521|FFFFFF,565|464|235650,311|415|383434,248|467|15222F,522|494|535D5C,620|174|003546", 0.9) = 1 Then 
+					Do
+						Touch 452, 772, 500
+						ShowMessage "Click NO Button"
+						Delay 1000
+						If CmpColorEx("216|148|111010,680|189|694F42,484|231|5B3226,417|1032|0067ED,304|1027|0069EC", 0.9) = 1 Then 
+							Exit Do
+						End If
+						Touch 367, 1025, 500
+						ShowMessage "Click OK Button"
+						Delay 1000
+						
+						// datechange
+						If CmpColorEx("606|516|6A5043,603|775|694E46,442|785|160F0C,123|772|613837,311|688|00E0FE,432|743|0050E2,130|521|5C3227",0.9) = 1 Then
+							Touch 354, 716, 500
+							ShowMessage "Click OK Button"
+							Delay 750
+						Else
+							TracePrint 0
+						End If
+					Loop
+					Exit Do
+				Else
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+End Function
+
+Function start_app()
+	//Start app
+	KillApp "jp.co.mixi.monsterstrikeTW"
+	Delay 1000
+	RunApp "jp.co.mixi.monsterstrikeTW"
+	Delay 1000
+End Function
+	
+Function start_menu()	
+	//Start Menu
+	Do
+		If CmpColorEx("40|1206|39CBB2,573|1198|0043EA,671|1200|0081F4", 0.9) = 1 Then 
+			Touch 274, 365, 500
+			ShowMessage "Touch Start Menu"
+			Delay 1000
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 2000
+	Loop
+	//Version Messaenge
+	Do
+		If CmpColorEx("216|148|111010,680|189|694F42,484|231|5B3226,417|1032|0067ED,304|1027|0069EC", 0.9) = 1 Then 
+			Touch 360, 1019, 500
+			ShowMessage "Click OK Button"
+			Delay 1000
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 2000
+	Loop
+	
+	// gift box info message
+	Do
+		// daily reward
+		If CmpColorEx("606|417|61483C,613|1067|4A2F2D,436|981|00E2FF,438|1041|4092EB,117|1074|684D45,127|418|4C3129,581|948|291913,593|529|2B1B12",0.9) = 1 Then
+			Touch 353, 1007, 500
+			ShowMessage "Click OK Button"
+			Delay 750
+		Else
+			TracePrint 0
+		End If
+		
+		// first login friend invite
+		If CmpColorEx("606|424|EFBC3F,617|458|0B0921,535|496|9CF8FF,470|521|2400DF,450|435|8F4448,303|537|00A2FF,642|996|008EF8",0.9) = 1 Then
+			Touch 589, 1020, 500
+			ShowMessage "Click No Button"
+			Delay 750
+			Do
+				If CmpColorEx("306|745|CCE6FF,203|688|70A28E,533|659|C3EEA5,376|661|990A7D,277|656|0D506F,412|1025|00DEFF",0.9) = 1 Then
+					Touch 364, 1053, 500
+					ShowMessage "Click OK Button"
+					Delay 750
+					Exit Do
+				Else
+					TracePrint 0
+				End If
+				
+				Delay 500
+			Loop
+		Else
+			TracePrint 0
+		End If
+		
+		// gift box has mail
+		If CmpColorEx("118|479|6A5043,294|721|00DCFF,237|851|454242,363|749|FFFFFF,436|773|0000C9,134|1021|312F2F",0.9) = 1 Then
+			Touch 364, 751, 500
+			ShowMessage "Click OK Button"
+			Delay 750
+		Else
+			TracePrint 0
+		End If
+		
+		// datechange
+		If CmpColorEx("606|516|6A5043,603|775|694E46,442|785|160F0C,123|772|613837,311|688|00E0FE,432|743|0050E2,130|521|5C3227",0.9) = 1 Then
+			Touch 354, 716, 500
+			ShowMessage "Click OK Button"
+			Delay 750
+		Else
+			TracePrint 0
+		End If
+		
+		// return main page
+		If CmpColorEx("458|243|999999,466|240|5D5D5D,94|257|FED000,52|275|FFFFBD,15|273|FF8F00,8|308|A5A5A6,20|312|424242",0.9) = 1 Then
+			Touch 65, 1212, 500
+			ShowMessage "Return Main Page"
+			Delay 750
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+End Function
+
+Function adventure()
+	// press adventure button
+	Do
+		// gift box info message
+		If CmpColorEx("118|479|6A5043,294|721|00DCFF,237|851|454242,363|749|FFFFFF,436|773|0000C9,134|1021|312F2F",0.9) = 1 Then
+			Touch 364, 751, 500
+			ShowMessage "Click OK Button"
+			Delay 750
+			// return main page
+			Do
+				If CmpColorEx("86|261|F77C00,54|278|FFFFBD,560|246|E77606,494|119|00B2FF",0.9) = 1 Then
+					Touch 65, 1212, 500
+					ShowMessage "Return Main Page"
+					Delay 750
+					Exit Do
+				Else
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+		Else
+			TracePrint 0
+		End If
+	
+		If CmpColorEx("686|938|A9CD01,186|1058|2F6391,25|969|96651F,467|1070|848D8E", 0.9) = 1 Then 
+			Tap 353, 975
+			ShowMessage "Click Adventuure Button"
+			Delay 1000
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+	// press event button
+	Do
+		If CmpColorEx("358|678|24B7FD,289|691|3FAB72,330|619|38B6F7,332|724|BF8647", 0.9) = 1 Then 
+			Touch 593, 619, 500
+			ShowMessage "Click Event Button"
+			Delay 750
+			Exit Do
+		Else
+			If CmpColorEx("338|644|AEC4EA,388|632|302076,298|661|685E70,437|702|E3CDE0",0.9) = 1 Then
+				Touch 360, 704, 500
+				ShowMessage "Click Event Button"
+				Delay 750
+				Exit Do
+			Else
+				TracePrint 0
+			End If
+		End If
+		
+		Delay 1000
+	Loop
+	
+	
+End Function
+
+Function select_game()
+	// select game
+	Do
+		If CmpColorEx("145|344|098C20,59|368|238119,554|405|4D3E3B,134|494|564644,109|348|FFFFFF",0.9) = 1 Then
+			Touch 317, 427, 500
+			ShowMessage "Select Growing Game"
+			Delay 750
+			Do
+				// choose level
+				If CmpColorEx("261|741|584745,343|937|534846,382|1042|51413F,474|582|61514F,150|344|0D6A1B,68|356|0E5B1B",0.9) = 1 Then
+					Touch 362, 611, 500
+					ShowMessage "Select Fire Stage"
+					Delay 750
+					Exit Do
+				Else
+					TracePrint 0
+				End If
+			
+				Delay 1000
+			Loop
+			
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+	
+	// muti players mode
+	Do
+		If CmpColorEx("516|652|005DFD,420|846|0068E5,431|719|4BDEF6,498|806|BCFDFF,580|627|4ABEFF",0.9) = 1 Then
+			Touch 488, 782, 500
+			ShowMessage "Muti Players"
+			Delay 750
+			Do
+				If CmpColorEx("231|633|43ECFF,199|733|5FDBFF,148|822|7FF8FF,109|676|0091FF,278|757|0091FF",0.9) = 1 Then
+					Touch 181, 753, 500
+					ShowMessage "Near Area"
+					Delay 750
+					Exit Do
+				Else
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+End Function
+
+Function room_password()
+	// press password mode button
+	Do
+		If CmpColorEx("669|238|FFBB00,670|251|E6690A,512|245|E67107,639|556|764234,665|511|7A7A7A",0.9) = 1 Then
+			Touch 600, 258, 500
+			ShowMessage "Password Mode"
+			Delay 750
+			// press blank area to input password
+			Do
+				If CmpColorEx("538|244|E77506,600|238|FFBB00,542|756|00DEFE,261|776|0070EF,345|674|EDEDED",0.9) = 1 Then
+					Touch 360, 669, 500
+					ShowMessage "Click Blank Area"
+					Delay 1000
+					InputText "111"
+					Delay 1000
+					Touch 214, 778, 500
+					// press OK button
+					Do
+						If CmpColorEx("681|245|E97806,535|238|FFBB00,520|754|00DEFF,253|764|0082F5,671|509|525252",0.9) = 1 Then
+							Touch 214, 778, 500
+							ShowMessage "Click OK Button"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+	
+	// game room open
+	Do
+		If CmpColorEx("692|311|5BC9DA,673|319|3DB6C9,668|238|FFBB00,382|1012|EBE017,337|1048|AAF5FF",0.9) = 1 Then
+			Touch 359, 1041, 500
+			ShowMessage "Open Room"
+			Delay 750
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+End Function
+
+// Server version : wait client
+Function wait_client()
+	// wait clients
+	Do
+		If CmpColorEx("261|960|6F90F8,103|968|0025DC,445|959|029F16,496|984|272727",0.9) = 1 Then
+			Do
+				// 2 player
+				If CmpColorEx("191|408|1313C5,185|524|03C7FA,209|525|00C5F8,179|658|2E2A2B,193|784|2C292A,490|648|F5F5F5,485|772|F5F5F5",0.9) = 1 Then
+					Touch 520, 989, 500
+					Do
+						If CmpColorEx("175|399|4545FF,189|400|0000FE,203|405|0000DE,115|482|6B5145,431|721|00DCFF,573|778|1A7AEA,281|722|00DEFF,608|484|6C5346",0.9) = 1 Then
+							Touch 222, 751, 500
+							ShowMessage "Click Yes"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+					Loop
+					ShowMessage "Start Game"
+					Delay 750
+					Exit Do
+				Else
+					TracePrint 0
+				End If
+				/*
+				// 4 player
+				If CmpColorEx("190|411|0000A4,183|522|00C8FB,192|666|146403,168|785|972D00,207|781|F7F5F5,185|666|CDDCCB,183|543|2576A8",0.9) = 1 Then
+					Touch 520, 989, 500
+					ShowMessage "Start Game"
+					Delay 750
+					Exit Do
+				Else
+					TracePrint 0
+				End If*/	
+			Loop	
+			Delay 8000
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 8000
+	Loop
+End Function
+
+// Client version : join game
+Function join_room()
+	Do
+		// press muti players search button
+		If CmpColorEx("682|938|ABCD01,613|1030|7DB30B,538|1027|4F6707,698|910|D5E0DF,480|1081|497682",0.9) = 1 Then
+			Touch 599, 1026, 500
+			ShowMessage "Press Search Button"
+			Delay 750
+			// password setting
+			Do
+				If CmpColorEx("662|239|FFB800,519|274|FF595A,92|256|FFC900,397|1018|03F21A,628|1106|684D45",0.9) = 1 Then
+					Touch 597, 256, 500
+					ShowMessage "Password Mode"
+					Delay 750
+						Do
+							If CmpColorEx("542|755|03F219,255|754|00DEFF,362|685|EDEDED,666|238|FFBB00,101|259|FFBB00",0.9) = 1 Then
+								Touch 368, 676, 500
+								ShowMessage "Blank Area"
+								Delay 1000
+								InputText "111"
+								Touch 358, 540, 500
+								Delay 750
+								// search 
+								Do
+									If CmpColorEx("577|759|2DED59,299|755|00DBFF,489|657|291912,668|238|FFBB00,94|268|F06B00",0.9) = 1 Then
+										Touch 500, 787, 500
+										ShowMessage "Search"
+										Delay 750
+											// search fail
+											Do
+												// research
+												If CmpColorEx("685|238|FFBB00,689|317|71CBE3,676|322|2ABCD2,100|260|FBB500,417|945|03F527,395|977|FFFFFF,665|1031|684D45",0.9) = 1 Then
+													Touch 357, 975, 500
+													ShowMessage "Research Room"
+													Delay 750
+												Else
+													TracePrint 0
+												End If
+												
+												// garbage message
+												If CmpColorEx("691|317|9BDAE5,674|323|2ABCD2,685|241|F0A304,534|240|F9DC04,88|255|FFC000,434|618|A3C3EB,356|620|6B6DA4,120|670|A16FEE,431|1068|00DCFF",0.9) = 1 Then
+													Touch 362, 1096, 500
+													ShowMessage "Click OK Button"
+													Delay 750
+												Else
+													TracePrint 0
+												End If
+												
+												// search success
+												If CmpColorEx("445|528|04F31F,421|549|FFFFFF,342|574|009400,272|529|00EE02,688|309|9BDAE5,677|324|26C1DC,665|238|FFBB00",0.9) = 1 Then
+													Touch 303, 407, 500
+													ShowMessage "Search Success"
+													Delay 1000
+													Do
+														If CmpColorEx("680|538|AFADAF,668|726|696969,438|823|CBB800,381|859|8CF2FF,315|854|898527", 0.9) = 1 Then 
+															Delay 1000
+															Touch 357, 859, 500
+															ShowMessage "Join Room"
+															Delay 750
+															Exit Do
+														Else
+															TracePrint 0
+														End If
+														
+														Delay 1000
+													Loop
+													Exit Do
+												Else
+													TracePrint 0
+												End If
+												
+												Delay 3000
+											Loop
+										Exit Do
+									Else
+										TracePrint 0
+									End If
+										
+									Delay 1000
+								Loop
+								Exit Do
+							Else
+								TracePrint 0
+							End If
+							
+							Delay 1000
+						Loop
+					Exit Do
+				Else 
+					Touch 599, 1026, 500
+					ShowMessage "Press Search Button"
+					Delay 750
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop	
+End Function
+
+Function battle()
+	Do
+		// battling
+		If CmpColorEx("254|1215|00B6FF,338|1250|0073A1,16|1213|0085BA,231|1176|93F9FF,673|1112|FBC501",0.9) = 1 Then
+			Swipe 521, 829, 204, 857, 200
+			Delay 750
+			Touch 360, 782, 500
+		Else
+			TracePrint 0
+		End If
+		
+		Touch 360, 1038, 500
+		Delay 500
+		Touch 360, 910, 500
+
+		// battleend
+		If CmpColorEx("14|499|02297E,15|464|011D4E,29|443|030150,7|341|002B51,689|397|080493,710|425|00346F",0.9) = 1 Then
+			Touch 360, 910, 500
+			If CmpColorEx("702|668|130AC2,702|861|007FDE,706|497|022B85,23|828|0703A0,429|1151|038800,345|1110|DBE5DB,294|1094|04F424",0.9) = 1 Then
+				For 5
+					Delay 1000
+					Touch 358, 910, 500
+				Next
+				final_check ()
+				
+				If CmpColorEx("702|668|130AC2,702|861|007FDE,706|497|022B85,23|828|0703A0,429|1151|038800,345|1110|DBE5DB,294|1094|04F424",0.9) = 1 Then
+					Touch 350, 1118, 500
+				End If
+				
+				ShowMessage "End Game"
+				Delay 750
+				Exit Do
+			Else
+				TracePrint 0
+			End If
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+End Function
+
+Function only_add_friend()
+	Do
+		// for only two player version
+		If CmpColorEx("177|258|FFFFFF,144|267|050252,129|267|FFFFFF,103|277|FFFFFF,76|250|BEBEBE,568|351|EB8606,489|345|FFBC00,172|263|242424",0.9) = 1 Then
+			// add first 
+			Touch 472, 373, 500
+			ShowMessage "Add Friend"
+			Delay 750
+			Do
+				If CmpColorEx("527|348|795902,605|421|694F43,112|423|6A5043,175|836|00E1FF,477|838|00DEFF",0.9) = 1 Then
+					Touch 220, 865, 500
+					ShowMessage "Click Yes"
+					Delay 750
+					Do
+						If CmpColorEx("564|346|533B00,388|346|533B00,604|480|694F43,609|808|684D45,120|479|6B5144,324|722|00DDFF",0.9) = 1 Then
+							Touch 359, 746, 500
+							ShowMessage "Click OK"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						If CmpColorEx("555|348|F2B204,468|347|FBD402,377|355|C92800,606|772|684D46,432|688|00E1FE,166|250|FFFFFF",0.9) = 1 Then
+							Touch 362, 713, 500
+							ShowMessage "Click OK"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else	
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		// ifalready friend
+		If CmpColorEx("103|248|FFFFFF,107|263|727272,99|268|9B9B9B,86|281|000006,139|256|373737,132|271|E8E8E8,157|274|06024F,162|260|06024B,169|251|050249,116|248|FFFFFF", 0.9) = 1 Then 
+			Exit Do
+		End If
+	Loop
+	
+	Do
+		// battleend
+		If CmpColorEx("14|499|02297E,15|464|011D4E,29|443|030150,7|341|002B51,689|397|080493,710|425|00346F",0.9) = 1 Then
+			Touch 360, 782, 500
+			If CmpColorEx("702|668|130AC2,702|861|007FDE,706|497|022B85,23|828|0703A0,429|1151|038800,345|1110|DBE5DB,294|1094|04F424",0.9) = 1 Then
+				Touch 350, 1118, 500
+				ShowMessage "End Game"
+				Delay 750
+				Exit Do
+			Else
+				TracePrint 0
+			End If
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+End Function
+
+Function final_check()
+	If mode = 0 Then 
+		only_add_friend ()
+		Exit Function
+	End If
+
+	Do
+		/*
+		// 3 new users
+		If CmpColorEx("545|348|F2B204,390|345|FFBC00,546|482|FCCC02,397|482|FCCB02,541|617|FDC401,400|617|FDC301,508|657|120601,507|523|6C2309,504|387|070201",0.9) = 1 Then
+			// add first
+			Touch 483, 381, 500
+			ShowMessage "Add Friend"
+			Delay 750
+			Do
+				If CmpColorEx("527|348|795902,605|421|694F43,112|423|6A5043,175|836|00E1FF,477|838|00DEFF",0.9) = 1 Then
+					Touch 220, 865, 500
+					ShowMessage "Click Yes"
+					Delay 750
+					Do
+						If CmpColorEx("564|346|533B00,388|346|533B00,604|480|694F43,609|808|684D45,120|479|6B5144,324|722|00DDFF",0.9) = 1 Then
+							Touch 359, 746, 500
+							ShowMessage "Click OK"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else	
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			// add second
+			Touch 472, 509, 500
+			ShowMessage "Add Friend"
+			Delay 750
+			Do
+				If CmpColorEx("527|348|795902,605|421|694F43,112|423|6A5043,175|836|00E1FF,477|838|00DEFF",0.9) = 1 Then
+					Touch 220, 865, 500
+					ShowMessage "Click Yes"
+					Delay 750
+					Do
+						If CmpColorEx("564|346|533B00,388|346|533B00,604|480|694F43,609|808|684D45,120|479|6B5144,324|722|00DDFF",0.9) = 1 Then
+							Touch 359, 746, 500
+							ShowMessage "Click OK"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else	
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			// add third
+			Touch 472, 644, 500
+			ShowMessage "Add Friend"
+			Delay 750
+			Do
+				If CmpColorEx("527|348|795902,605|421|694F43,112|423|6A5043,175|836|00E1FF,477|838|00DEFF",0.9) = 1 Then
+					Touch 220, 865, 500
+					ShowMessage "Click Yes"
+					Delay 750
+					Do
+						If CmpColorEx("564|346|533B00,388|346|533B00,604|480|694F43,609|808|684D45,120|479|6B5144,324|722|00DDFF",0.9) = 1 Then
+							Touch 359, 746, 500
+							ShowMessage "Click OK"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else	
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		// 2 new user
+		If CmpColorEx("546|348|F2B204,391|348|F1AE04,556|480|FFBD00,397|480|FFBD00,546|671|0502C9,451|664|0201D6",0.9) = 1 Then
+			// add first
+			Touch 483, 381, 500
+			ShowMessage "Add Friend"
+			Delay 750
+			Do
+				If CmpColorEx("527|348|795902,605|421|694F43,112|423|6A5043,175|836|00E1FF,477|838|00DEFF",0.9) = 1 Then
+					Touch 220, 865, 500
+					ShowMessage "Click Yes"
+					Delay 750
+					Do
+						If CmpColorEx("564|346|533B00,388|346|533B00,604|480|694F43,609|808|684D45,120|479|6B5144,324|722|00DDFF",0.9) = 1 Then
+							Touch 359, 746, 500
+							ShowMessage "Click OK"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else	
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			// add second
+			Touch 472, 509, 500
+			ShowMessage "Add Friend"
+			Delay 750
+			Do
+				If CmpColorEx("527|348|795902,605|421|694F43,112|423|6A5043,175|836|00E1FF,477|838|00DEFF",0.9) = 1 Then
+					Touch 220, 865, 500
+					ShowMessage "Click Yes"
+					Delay 750
+					Do
+						If CmpColorEx("564|346|533B00,388|346|533B00,604|480|694F43,609|808|684D45,120|479|6B5144,324|722|00DDFF",0.9) = 1 Then
+							Touch 359, 746, 500
+							ShowMessage "Click OK"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else	
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			// keep going or switch user
+			Do
+				Dim intX,intY
+				FindPic 220,595,319,614,"Attachment:two_user1.png","000000",0,0.8,intX,intY
+				If intX > -1 And intY > -1 Then
+					If CmpColorEx("631|646|9930E5,633|638|D38EFB,635|643|AB4AEC,633|651|820DDB",0.9) = 1 Then
+						If mode = 1 Then 
+							switch = 1
+						End If
+					Else
+						switch = 0
+					End If
+					
+					Exit Do
+				End If
+				
+				Delay 1000
+			Loop
+			
+		Else
+			TracePrint 0
+		End If
+		
+		// 1 new user
+		If CmpColorEx("543|345|E7AB00,500|552|050396,399|351|D16A05,449|672|0201C3,511|674|0C0ABB,486|543|050398",0.9) = 1 Then
+			// add first 
+			Touch 472, 373, 500
+			ShowMessage "Add Friend"
+			Delay 750
+			Do
+				If CmpColorEx("527|348|795902,605|421|694F43,112|423|6A5043,175|836|00E1FF,477|838|00DEFF",0.9) = 1 Then
+					Touch 220, 865, 500
+					ShowMessage "Click Yes"
+					Delay 750
+					Do
+						If CmpColorEx("564|346|533B00,388|346|533B00,604|480|694F43,609|808|684D45,120|479|6B5144,324|722|00DDFF",0.9) = 1 Then
+							Touch 359, 746, 500
+							ShowMessage "Click OK"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else	
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			// keep going or switch user
+			Do
+				//Dim intX,intY
+				FindPic 220,460,315,477,"Attachment:one_user1.png","000000",0,0.8,intX,intY
+				If intX > -1 And intY > -1 Then
+					If CmpColorEx("637|509|3B3B3B,637|515|3B3B3B,635|519|3B3B3B,638|506|2E2E2E,637|511|3B3B3B",0.9) = 1 Then
+						switch = 0
+					Else
+						If mode = 1 Then 
+							switch = 1
+						End If
+					End If
+					
+					Exit Do
+				End If
+				
+				FindPic 215,593,315,615,"Attachment:one_user2.png","000000",0,0.8,intX,intY
+				If intX > -1 And intY > -1 Then
+					If CmpColorEx("638|643|353535,639|648|333333,638|652|373737,638|648|3A3A3A,636|641|383838",0.9) = 1 Then
+						switch = 0
+					Else
+						If mode = 1 Then 
+							switch = 1
+						End If
+					End If
+					
+					Exit Do
+				End If
+				
+				Delay 1000
+			Loop
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		// 0 new user
+		
+		If CmpColorEx("82|252|AFAFAF,104|263|FFFFFF,155|274|050255,153|258|06024A,128|265|000000,126|275|757575,118|248|EBEBEB,111|258|000000,101|161|03ADE7",0.9) = 1 Then
+			Dim intX,intY
+			FindPic 220,286,315,308,"Attachment:zero_user1.png","000000",0,0.8,intX,intY
+			If intX > -1 And intY > -1 Then
+				If CmpColorEx("636|339|3B3B3B,637|344|3B3B3B,634|346|3B3B3B,636|333|303030",0.9) = 1 Then
+					switch = 0
+				Else
+					If mode = 1 Then 
+						switch = 1
+					End If
+				End If
+					
+				Exit Do
+			End If
+				
+				
+			FindPic 218,425,322,445,"Attachment:zero_user2.png","000000",0,0.8,intX,intY
+			If intX > -1 And intY > -1 Then
+				If CmpColorEx("636|477|8D1EE0,632|467|CD81FA,637|469|CE8DF8,637|476|9226E1,634|484|5A00A1",0.9) = 1 Then
+					If mode = 1 Then 
+						switch = 1
+					End If
+				Else
+					switch = 0
+				End If
+					
+				Exit Do
+			End If
+				
+				
+			FindPic 217,561,313,586,"Attachment:zero_user3.png","000000",0,0.8,intX,intY
+			If intX > -1 And intY > -1 Then
+				If CmpColorEx("637|609|3B3B3B,639|610|323232,638|613|3A3A3A,635|619|3A3A3A",0.8) = 1 Then
+					switch = 0
+				Else
+					If mode = 1 Then 
+						switch = 1
+					End If
+				End If
+					
+				Exit Do
+			End If
+		Else
+			TracePrint 0
+		End If
+		*/
+			
+		// for only two player version
+		// add friend
+		If CmpColorEx("177|258|FFFFFF,144|267|050252,129|267|FFFFFF,103|277|FFFFFF,76|250|BEBEBE,568|351|EB8606,489|345|FFBC00,172|263|242424",0.9) = 1 Then
+			// add first 
+			Touch 472, 373, 500
+			ShowMessage "Add Friend"
+			Delay 750
+			Do
+				If CmpColorEx("527|348|795902,605|421|694F43,112|423|6A5043,175|836|00E1FF,477|838|00DEFF",0.9) = 1 Then
+					Touch 220, 865, 500
+					ShowMessage "Click Yes"
+					Delay 750
+					Do
+						If CmpColorEx("564|346|533B00,388|346|533B00,604|480|694F43,609|808|684D45,120|479|6B5144,324|722|00DDFF",0.9) = 1 Then
+							Touch 359, 746, 500
+							ShowMessage "Click OK"
+							Delay 750
+							Exit Do
+						Else
+							TracePrint 0
+						End If
+						
+						Delay 1000
+					Loop
+					Exit Do
+				Else	
+					TracePrint 0
+				End If
+				
+				Delay 1000
+			Loop
+			
+			Exit Do
+		Else
+			TracePrint 0
+		End If
+		
+		// already friend
+		
+		If CmpColorEx("103|248|FFFFFF,107|263|727272,99|268|9B9B9B,86|281|000006,139|256|373737,132|271|E8E8E8,157|274|06024F,162|260|06024B,169|251|050249,116|248|FFFFFF",0.9) = 1 Then
+			Dim intX,intY
+			FindPic 220,286,315,308,"Attachment:zero_user1.png","000000",0,0.8,intX,intY
+			If intX > -1 And intY > -1 Then
+				If CmpColorEx("636|339|3B3B3B,637|344|3B3B3B,634|346|3B3B3B,636|333|303030",0.9) = 1 Then
+					switch = 0
+				Else
+					If mode = 1 Then 
+						switch = 1
+					End If
+				End If
+					
+				Exit Do
+			End If
+		End If
+		
+		Delay 1000
+	Loop
+	
+	Do
+		// battleend
+		If CmpColorEx("14|499|02297E,15|464|011D4E,29|443|030150,7|341|002B51,689|397|080493,710|425|00346F",0.9) = 1 Then
+			Touch 360, 782, 500
+			If CmpColorEx("702|668|130AC2,702|861|007FDE,706|497|022B85,23|828|0703A0,429|1151|038800,345|1110|DBE5DB,294|1094|04F424",0.9) = 1 Then
+				Touch 350, 1118, 500
+				//ShowMessage "End Game"
+				Delay 750
+				Do
+					If CmpColorEx("702|668|130AC2,702|861|007FDE,706|497|022B85,23|828|0703A0,429|1151|038800,345|1110|DBE5DB,294|1094|04F424", 0.9) = 1 Then 
+						Touch 350, 1118, 500
+						Delay 750
+					Else 
+						Exit Do
+					End If
+					Delay 500
+				Loop
+				Exit Do
+			Else
+				TracePrint 0
+			End If
+		Else
+			TracePrint 0
+		End If
+		
+		Delay 1000
+	Loop
+End Function
+
+Function change_user(index, save_index)
+	// close app
+	KillApp "jp.co.mixi.monsterstrikeTW"
+	Delay 1000
+	
+	Dim open_index = index
+	
+	ShanHai.Mount ("/data")
+	Dir.Copy("/data/data/jp.co.mixi.monsterstrikeTW/data10.bin", "/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(save_index) &"/data10.bin")
+	
+	If Dir.Exist("/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(index)) = 2 Then 
+		Dir.Copy("/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(index) &"/data10.bin", "/data/data/jp.co.mixi.monsterstrikeTW/data10.bin")
+		open_index = index
+	Else 
+		Dir.Copy("/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(1) &"/data10.bin", "/data/data/jp.co.mixi.monsterstrikeTW/data10.bin")
+		open_index = 1
+	End If
+	
+	change_user = open_index
+	
+End Function
+
+Function create_user()
+	Dim data10_path = "/data/data/jp.co.mixi.monsterstrikeTW/data10.bin"
+	ShanHai.Mount ("/data")
+	
+	If Dir.Exist("/storage/emulated/legacy/MobileAnJian/dataBase") = 0 Then 
+		Dir.Create("/storage/emulated/legacy/MobileAnJian/dataBase")
+	End If
+	
+	Dim index = 1
+	Do
+		If Dir.Exist("/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(index) & "/") = 2 Then
+			index = index + 1
+		Else 
+			Dir.Create ("/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(index) & "/")
+			Exit Do
+		End If
+		
+	Loop
+	
+	If Dir.Exist(data10_path) Then 
+		Dir.Copy(data10_path, "/storage/emulated/legacy/MobileAnJian/dataBase/" & CStr(index) &"/data10.bin")
+		ShowMessage "User Create Success"
+	End If
+End Function
+
+Function reset_app()
+	Dim data10_path = "/data/data/jp.co.mixi.monsterstrikeTW/data10.bin"
+	Dim data13_path = "/data/data/jp.co.mixi.monsterstrikeTW/data13.bin"
+	Dim data16_path = "/data/data/jp.co.mixi.monsterstrikeTW/data16.bin"
+	
+	ShanHai.Mount ("/data")
+	
+	If Dir.Exist(data10_path) Then 
+		Dir.Delete(data10_path)
+	End If 
+	
+	If Dir.Exist(data13_path) Then 
+		Dir.Delete(data13_path)
+	End If
+	
+	If Dir.Exist(data16_path) Then 
+		Dir.Delete(data16_path)
+	End If 
+End Function
+
+	 
+	
+Function ui_close()
+	i =  UI.GetValue("account")
+	i = CInt(i["account"])
+End Function
+
+Call client()
+
+
+ 
